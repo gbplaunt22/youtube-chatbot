@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>My Chatbot</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; }
+        .msg-user { text-align: right; margin: 5px 0; }
+        .msg-bot { text-align: left; margin: 5px 0; }
+        .bubble { display: inline-block; padding: 6px 10px; border-radius: 10px; }
+        .user-bubble { background: #007bff22; }
+        .bot-bubble { background: #00aa5522; }
+    </style>
+</head>
+<body>
+<h1>Talk to Gavin!</h1>
+<div id="chat"></div>
+
+<form id="form">
+    <input id="input" type="text" placeholder="Wash my bellay..." style="width:80%;" />
+    <button type="submit">Send</button>
+</form>
+
+<script>
+    const chatDiv = document.getElementById('chat');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+
+    function addMessage(role, text) {
+        const wrapper = document.createElement('div');
+        wrapper.className = role === 'user' ? 'msg-user' : 'msg-bot';
+
+        const bubble = document.createElement('span');
+        bubble.className = 'bubble ' + (role === 'user' ? 'user-bubble' : 'bot-bubble');
+        bubble.textContent = text;
+
+        wrapper.appendChild(bubble);
+        chatDiv.appendChild(wrapper);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage('user', text);
+        input.value = '';
+
+        const res = await fetch('/chat', {  // <-- no http://127.0.0.1:8000 here
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+
+
+        const data = await res.json();
+        const reply = data.reply;
+
+        addMessage('assistant', reply);
+    });
+</script>
+</body>
+</html>
