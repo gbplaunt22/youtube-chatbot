@@ -6,3 +6,4 @@ __pycache__/
 
 # Env files (Secrets!)
 .env
+secret.env
